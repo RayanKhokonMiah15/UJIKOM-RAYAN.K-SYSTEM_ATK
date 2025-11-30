@@ -6,7 +6,7 @@
    2. /operator/barang/index.blade.php - Halaman Daftar Barang
    3. /operator/barang/create.blade.php - Halaman Tambah Barang
    4. /operator/barang/edit.blade.php - Halaman Edit Barang
-   5. /permintaan/create.blade.php - Halaman Permintaan Barang
+   5. /permintaan/create.blade.php - Halaman Permintaan Barang + AI Chat
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
@@ -37,10 +37,21 @@
    1. Layout Utama & Navbar (/layouts/app.blade.php)
    -------------------------------------------------------------------------- */
 /* Layout Global */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   background-color: var(--bg-light);
-  font-family: 'Segoe UI', Tahoma, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-dark);
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 .container {
@@ -51,10 +62,14 @@ body {
 
 /* Navbar Styles */
 .navbar {
-  background-color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background: white !important;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(52, 152, 219, 0.08);
   margin-bottom: 1.5rem;
   border-bottom: 1px solid rgba(52, 152, 219, 0.1);
 }
@@ -110,9 +125,9 @@ body {
   content: '';
   position: absolute;
   bottom: 0;
-  right: 0;                 /* Mulai dari kanan */
+  right: 0;
   height: 2px;
-  width: 0;                  /* Awalnya tidak terlihat */
+  width: 0;
   background-color: var(--primary);
   transition: width 0.3s ease, left 0.3s ease, right 0.3s ease;
 }
@@ -120,9 +135,9 @@ body {
 /* Hover efek: underline muncul dari kanan ke kiri */
 .nav-link:hover::after,
 .nav-link.active::after {
-  left: 0;                   /* Tepi kiri */
+  left: 0;
   right: auto;
-  width: 100%;               /* Panjang penuh */
+  width: 100%;
 }
 
 /* Hover text color */
@@ -130,9 +145,8 @@ body {
 .nav-link.active {
   color: var(--primary) !important;
   background: none !important;
-  text-decoration: none;      /* Hapus text-decoration bawaan */
+  text-decoration: none;
 }
-
 
 /* --------------------------------------------------------------------------
    2. Halaman Daftar Barang (/operator/barang/index.blade.php)
@@ -185,7 +199,6 @@ body {
 }
 
 /* Tombol-tombol Halaman Index */
-/* Tombol Tambah Data */
 .btn-tambah {
   background-color: rgba(46, 204, 113, 0.1);
   color: var(--success);
@@ -199,7 +212,6 @@ body {
   color: var(--bg-white);
 }
 
-/* Tombol Edit Data */
 .btn-edit {
   background-color: rgba(52, 152, 219, 0.1);
   color: var(--primary);
@@ -213,7 +225,6 @@ body {
   color: var(--bg-white);
 }
 
-/* Tombol Hapus Data */
 .btn-hapus {
   background-color: rgba(231, 76, 60, 0.1);
   color: var(--danger);
@@ -240,7 +251,6 @@ body {
 /* --------------------------------------------------------------------------
    3. Halaman Tambah Barang (/operator/barang/create.blade.php)
    -------------------------------------------------------------------------- */
-/* Container Form */
 .form-wrapper {
   background-color: var(--bg-white);
   border-radius: 8px;
@@ -248,14 +258,12 @@ body {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-/* Judul Halaman */
 .page-heading {
   font-size: 1.4rem;
   color: var(--text-dark);
   margin-bottom: 1rem;
 }
 
-/* Form Elements */
 .form-control,
 .form-select {
   border-radius: 6px;
@@ -279,13 +287,11 @@ label {
   color: var(--text-dark);
 }
 
-/* Preview Image */
 .preview-img {
   max-height: 90px;
   border-radius: 4px;
 }
 
-/* Custom Select Style */
 .custom-select {
   appearance: none;
   background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6L1.41 0z'/%3E%3C/svg%3E");
@@ -294,32 +300,557 @@ label {
   background-size: 12px;
 }
 
-/* ====================
-   ALERT & NOTIFIKASI 
-   ==================== */
-.alert-success-custom {
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-save,
+.btn-update {
   background-color: rgba(52, 152, 219, 0.1);
   color: var(--primary);
   border: 1px solid var(--primary);
-  padding: 1rem;
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  min-width: 120px;
 }
 
-/* ====================
-   IMAGE STYLES 
-   ==================== */
-.table-img {
+.btn-save:hover,
+.btn-save:active,
+.btn-update:hover,
+.btn-update:active {
+  background-color: var(--primary) !important;
+  color: var(--bg-white) !important;
+  border-color: var(--primary) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
+}
+
+.btn-back {
+  background-color: rgba(108, 117, 125, 0.1);
+  color: var(--text-muted);
+  border: 1px solid var(--text-muted);
+  padding: 0.5rem 1.5rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.btn-back:hover,
+.btn-back:active {
+  background-color: var(--text-muted) !important;
+  color: var(--bg-white) !important;
+  border-color: var(--text-muted) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(108, 117, 125, 0.2);
+}
+
+/* --------------------------------------------------------------------------
+   5. Hero Section - Halaman Permintaan (/permintaan/create.blade.php)
+   -------------------------------------------------------------------------- */
+.hero-section {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 80px 20px;
+}
+
+.hero-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.3;
+}
+
+.hero-content {
+  text-align: center;
+  color: white;
+  max-width: 800px;
+  z-index: 1;
+  animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+  line-height: 1.2;
+}
+
+.hero-description {
+  font-size: 1.25rem;
+  margin-bottom: 2.5rem;
+  opacity: 0.95;
+  line-height: 1.6;
+}
+
+.hero-btn {
+  background: white;
+  color: #667eea;
+  padding: 16px 48px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+  color: #764ba2;
+}
+
+.hero-illustration {
+  margin-top: 3rem;
+  position: relative;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.illustration-box {
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  display: inline-block;
+  margin: 0 15px;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+}
+
+.illustration-box::before {
+  content: '📦';
+  font-size: 3rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.illustration-box:nth-child(2)::before {
+  content: '📋';
+}
+
+.illustration-box:nth-child(3)::before {
+  content: '✅';
+}
+
+/* --------------------------------------------------------------------------
+   6. Form Section dengan AI Chat (/permintaan/create.blade.php)
+   -------------------------------------------------------------------------- */
+.form-section {
+  min-height: 100vh;
+  padding: 80px 20px;
+  background: #f8f9fa;
+}
+
+.form-chat-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ===== AI CHAT CONTAINER ===== */
+.chat-container {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  height: 700px;
+  overflow: hidden;
+  position: sticky;
+  top: 100px;
+}
+
+.chat-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  color: white;
+}
+
+.chat-header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bot-avatar {
+  width: 48px;
   height: 48px;
-  width: auto;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-right: 8px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
 }
 
-/* ====================
-   UTILITY CLASSES 
-   ==================== */
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 10px;
+}
+
+/* AI Message Bubble */
+.ai-message {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.message-content {
+  background: white;
+  padding: 12px 16px;
+  border-radius: 12px;
+  max-width: 80%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.message-content p {
+  margin: 0 0 8px 0;
+}
+
+.message-content p:last-child {
+  margin-bottom: 0;
+}
+
+.message-content ul {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.message-content li {
+  margin: 4px 0;
+}
+
+/* User Message Bubble */
+.user-message {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+  animation: slideIn 0.3s ease;
+}
+
+.user-message .message-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  max-width: 80%;
+}
+
+/* Chat Input Area */
+.chat-input-wrapper {
+  padding: 20px;
+  background: white;
+  border-top: 1px solid #e2e8f0;
+  display: flex;
+  gap: 12px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 24px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.chat-input:focus {
+  border-color: #667eea;
+}
+
+.chat-send-btn {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.chat-send-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.chat-send-btn:active {
+  transform: scale(0.95);
+}
+
+/* Barang Info Card in Chat */
+.barang-info-card {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.barang-info-card p {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+/* ===== REQUEST BOX (Form) ===== */
+.request-box {
+  background-color: var(--bg-white);
+  padding: 30px 35px;
+  border: 1px solid var(--border-light);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.request-box h4 {
+  color: var(--primary);
+}
+
+.request-box label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.request-box .form-control,
+.request-box .form-select {
+  border-radius: 6px;
+  border: 1px solid var(--border-light);
+  font-size: 14px;
+  padding: 8px 10px;
+  background-color: var(--bg-white);
+}
+
+.request-box .form-control:focus,
+.request-box .form-select:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: none;
+}
+
+.request-box .btn-primary {
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.request-box .btn-outline-secondary {
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+/* Modal Stok */
+.preview-img-modal {
+  max-width: 160px;
+  max-height: 120px;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.barang-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.barang-card {
+  border: 1px solid #e9ecef;
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff;
+  text-align: center;
+}
+
+/* Select2 Styling */
+.select2-container .select2-selection--single {
+  height: 38px;
+  padding: 5px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 36px;
+  right: 8px;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE STYLES
+   -------------------------------------------------------------------------- */
+@media (max-width: 992px) {
+  .form-chat-wrapper {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-container {
+    height: 500px;
+    position: relative;
+    top: 0;
+  }
+
+  .hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .request-box {
+    padding: 25px;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-description {
+    font-size: 1rem;
+  }
+
+  .hero-btn {
+    padding: 12px 32px;
+    font-size: 1rem;
+  }
+
+  .illustration-box {
+    width: 90px;
+    height: 90px;
+    margin: 0 8px;
+  }
+
+  .illustration-box::before {
+    font-size: 2rem;
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .container {
+    padding: 0 10px;
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 1rem;
+  }
+
+  .btn-save,
+  .btn-update,
+  .btn-back {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .illustration-box {
+    width: 70px;
+    height: 70px;
+  }
+
+  .illustration-box::before {
+    font-size: 1.5rem;
+  }
+
+  .chat-container {
+    height: 400px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   UTILITY CLASSES
+   -------------------------------------------------------------------------- */
 .page-title {
   color: var(--text-dark);
   font-weight: 500;
@@ -330,27 +861,7 @@ label {
   color: var(--text-muted) !important;
 }
 
-/* ====================
-   RESPONSIVE STYLES 
-   ==================== */
-@media (max-width: 768px) {
-  .table-responsive {
-    overflow-x: auto;
-  }
-  
-  .btn {
-    padding: 0.375rem 0.5rem;
-    font-size: 0.875rem;
-  }
-  
-  .container {
-    padding: 0 10px;
-  }
-}
-
-/* ====================
-   MODAL STYLES 
-   ==================== */
+/* Modal Styles */
 .modal-content {
   border-radius: 8px;
   border: none;
@@ -364,183 +875,4 @@ label {
 
 .btn-close-white {
   filter: brightness(0) invert(1);
-}
-
-/* ====================
-   FORM BUTTON STYLES 
-   ==================== */
-/* Form Actions Container */
-.form-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-light);
-}
-
-/* Save Button - create.blade.php */
-.btn-save {
-    background-color: rgba(52, 152, 219, 0.1);
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    padding: 0.5rem 1.5rem;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    min-width: 120px;
-}
-.btn-save:hover,
-.btn-save:active {
-    background-color: var(--primary) !important;
-    color: var(--bg-white) !important;
-    border-color: var(--primary) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
-}
-
-/* Update Button - edit.blade.php */
-.btn-update {
-    background-color: rgba(52, 152, 219, 0.1);
-    color: var(--primary);
-    border: 1px solid var(--primary);
-    padding: 0.5rem 1.5rem;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    min-width: 120px;
-}
-.btn-update:hover,
-.btn-update:active {
-    background-color: var(--primary) !important;
-    color: var(--bg-white) !important;
-    border-color: var(--primary) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.2);
-}
-
-/* Back Button - create.blade.php & edit.blade.php */
-.btn-back {
-    background-color: rgba(108, 117, 125, 0.1);
-    color: var(--text-muted);
-    border: 1px solid var(--text-muted);
-    padding: 0.5rem 1.5rem;
-    font-size: 0.95rem;
-    transition: all 0.2s ease;
-    min-width: 120px;
-}
-.btn-back:hover,
-.btn-back:active {
-    background-color: var(--text-muted) !important;
-    color: var(--bg-white) !important;
-    border-color: var(--text-muted) !important;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(108, 117, 125, 0.2);
-}
-
-@media (max-width: 576px) {
-    .form-actions {
-        flex-direction: column-reverse;
-        gap: 1rem;
-    }
-    .btn-save,
-    .btn-update,
-    .btn-back {
-        width: 100%;
-    }
-}
-
-/* --------------------------------------------------------------------------
-   5. Halaman Permintaan Barang (/permintaan/create.blade.php)
-   -------------------------------------------------------------------------- */
-/* Layout Halaman */
-.request-container {
-    background-color: var(--bg-light);
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    color: var(--text-dark);
-}
-
-/* Container Form Permintaan */
-.request-box {
-    background-color: var(--bg-white);
-    padding: 30px 35px;
-    border: 1px solid var(--border-light);
-    border-radius: 10px;
-    width: 100%;
-    max-width: 520px;
-}
-
-/* Request Form Elements */
-.request-box h4 {
-    color: var(--primary);
-}
-
-.request-box label {
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 6px;
-}
-
-.request-box .form-control,
-.request-box .form-select {
-    border-radius: 6px;
-    border: 1px solid var(--border-light);
-    font-size: 14px;
-    padding: 8px 10px;
-    background-color: var(--bg-white);
-}
-
-/* Custom Dropdown */
-.request-box .custom-select {
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23666' d='M1.41 0L6 4.58 10.59 0 12 1.41l-6 6-6-6L1.41 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    background-size: 12px;
-}
-
-.request-box .form-control:focus,
-.request-box .form-select:focus {
-    border-color: var(--primary);
-    outline: none;
-    box-shadow: none;
-}
-
-/* Request Buttons */
-.request-box .btn-primary {
-    background-color: var(--primary);
-    border: none;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.request-box .btn-outline-secondary {
-    border-radius: 6px;
-    font-size: 13px;
-}
-
-/* Request Modal */
-.request-modal .modal-content {
-    border-radius: 8px;
-    border: none;
-}
-
-.request-modal .modal-header {
-    background-color: var(--primary);
-    color: var(--bg-white);
-    border-radius: 8px 8px 0 0;
-}
-
-/* Request Grid */
-.request-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .request-box {
-        padding: 25px;
-
-
-  }
 }

@@ -49,7 +49,7 @@
         }
 
         .login-container {
-            background: white;
+            background: rgba(50, 190, 255, 1);
             padding: 35px 40px;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);

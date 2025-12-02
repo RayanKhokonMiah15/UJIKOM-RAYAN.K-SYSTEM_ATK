@@ -74,6 +74,14 @@ Aplikasi ini dikembangkan sebagai bagian dari **Uji Kompetensi** dengan fokus pa
 
 ### 🎯 Use Case Diagram
 
+![Use Case Diagram - Sistem Manajemen Barang](./docs/UseCaseDiagram.png)
+
+*Gambar di atas menunjukkan interaksi antara aktor (Karyawan, Operator) dengan sistem manajemen barang, termasuk semua fungsi dan proses utama.*
+
+---
+
+#### ASCII Diagram (Alternatif):
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    Sistem Manajemen Barang                  │

@@ -9,6 +9,7 @@ Sistem Manajemen Barang adalah aplikasi web berbasis Laravel 11 yang dirancang u
 -   [Deskripsi Project](#-deskripsi-project)
 -   [Fitur Utama](#-fitur-utama)
 -   [Tech Stack](#-tech-stack)
+-   [Use Case](#-use-case)
 -   [Schema Database](#-schema-database)
 -   [ERD & UML Diagram](#-erd--uml-diagram)
 -   [Instalasi](#-instalasi)
@@ -66,6 +67,278 @@ Aplikasi ini dikembangkan sebagai bagian dari **Uji Kompetensi** dengan fokus pa
 | **Authentication** | Laravel Authentication      |
 | **ORM**            | Eloquent                    |
 | **Testing**        | PHPUnit                     |
+
+---
+
+## 📌 Use Case
+
+### 🎯 Use Case Diagram
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Sistem Manajemen Barang                  │
+└─────────────────────────────────────────────────────────────┘
+              ▲                                    ▲
+              │                                    │
+       ┌──────┴──────┐                    ┌────────┴────────┐
+       │              │                    │                 │
+    KARYAWAN      OPERATOR              DATABASE         SYSTEM
+       │              │                    │                 │
+       │              ├─── Lihat Barang ───┤                 │
+       │              │                    │                 │
+       ├─ Ajukan ────►├─── Proses Permintaan                 │
+       │  Permintaan  │                    │                 │
+       │              ├─── Kelola Stok ────┤                 │
+       │              │                    │                 │
+       │              ├─── Export Laporan ─┤                 │
+       │              │                    │                 │
+       │◄─ Notifikasi─┤                    ├─ Audit Trail ──┤
+       │              │                    │                 │
+       │◄─ Status ────┤                    │                 │
+       │              │                    │                 │
+```
+
+### 📋 Detail Use Case
+
+#### **1. UC-001: Ajukan Permintaan Barang**
+
+**Actor:** Karyawan
+
+**Deskripsi:** Karyawan mengajukan permintaan barang melalui form.
+
+**Alur Normal:**
+
+1. Karyawan membuka halaman permintaan barang
+2. Memilih barang yang diinginkan dari dropdown
+3. Mengisi nama peminta dan nama ruangan
+4. Menentukan jumlah permintaan
+5. Menandatangani secara digital
+6. Sistem menyimpan permintaan dengan status "Pending"
+7. Sistem mengirim notifikasi ke operator
+
+**Hasil:** Permintaan barang tersimpan dalam database
+
+---
+
+#### **2. UC-002: Lihat Stok Barang**
+
+**Actor:** Karyawan, Operator
+
+**Deskripsi:** Pengguna dapat melihat daftar barang dan stok yang tersedia.
+
+**Alur Normal:**
+
+1. Pengguna membuka halaman stok barang / modal informasi
+2. Sistem menampilkan daftar barang dengan detail:
+    - Kode barang
+    - Nama barang
+    - Stok saat ini
+    - Satuan
+    - Kategori
+    - Foto barang (jika ada)
+3. Pengguna dapat mencari/filter barang
+
+**Hasil:** Informasi stok barang ditampilkan dengan akurat
+
+---
+
+#### **3. UC-003: Kelola Barang (CRUD)**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator mengelola master data barang.
+
+**Alur - Create:**
+
+1. Operator membuka halaman tambah barang
+2. Mengisi form data barang:
+    - Kode barang (unik)
+    - Nama barang
+    - Stok awal
+    - Satuan
+    - Kategori
+    - Foto (opsional)
+3. Sistem menyimpan data barang
+4. Sistem membuat history "created"
+
+**Alur - Read:**
+
+1. Operator melihat daftar barang di tabel
+2. Informasi ditampilkan dengan sorting/filter
+
+**Alur - Update:**
+
+1. Operator klik edit pada barang tertentu
+2. Mengubah data barang
+3. Sistem menyimpan perubahan
+4. Sistem membuat history "stock_changed"
+
+**Alur - Delete:**
+
+1. Operator klik hapus pada barang tertentu
+2. Sistem melakukan soft delete
+3. Barang tidak tampil di list normal
+
+---
+
+#### **4. UC-004: Proses Permintaan Barang**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator menerima dan memproses permintaan dari karyawan.
+
+**Alur Normal:**
+
+1. Operator membuka halaman daftar permintaan (status: Pending)
+2. Memilih permintaan yang akan diproses
+3. Operator dapat:
+    - **Approve:** Cek stok, kurangi stok, buat catatan barang keluar, update status "Selesai"
+    - **Reject:** Memberikan alasan penolakan, update status "Rejected"
+4. Sistem membuat history perubahan stok
+5. Sistem mengirim notifikasi ke peminta
+
+**Hasil:** Permintaan diproses dan stok diperbarui
+
+---
+
+#### **5. UC-005: Catat Barang Masuk/Keluar**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator mencatat barang yang masuk atau keluar dari gudang.
+
+**Alur - Barang Keluar:**
+
+1. Saat permintaan diapprove, sistem otomatis membuat record barang keluar
+2. Record berisi:
+    - ID Barang
+    - Jumlah keluar
+    - Tanggal keluar
+
+**Alur - Barang Masuk:**
+
+1. Operator dapat manual menambah stok barang
+2. Melalui fitur edit barang
+3. Sistem otomatis membuat history
+
+**Hasil:** Catatan barang masuk/keluar tersimpan dan akurat
+
+---
+
+#### **6. UC-006: Lihat Riwayat Perubahan Stok**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator melihat audit trail semua perubahan stok.
+
+**Alur Normal:**
+
+1. Operator membuka halaman "Info Barang Masuk/Keluar"
+2. Sistem menampilkan history dengan detail:
+    - Type perubahan (created, stock_changed, other)
+    - Jumlah perubahan
+    - Stok sebelum & sesudah
+    - Catatan/alasan perubahan
+    - Timestamp
+
+**Alur Laporan:**
+
+1. Operator dapat memfilter berdasarkan tanggal
+2. Export laporan ke format PDF
+3. Sistem generate laporan dengan format profesional
+
+**Hasil:** Audit trail lengkap tersimpan dan dapat dilacak
+
+---
+
+#### **7. UC-007: Generate Laporan & Statistik**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator membuat laporan penggunaan barang.
+
+**Alur Normal:**
+
+1. Operator membuka halaman statistik permintaan
+2. Sistem menampilkan:
+    - Jumlah permintaan per bulan
+    - Barang paling banyak diminta
+    - Status permintaan (pending, selesai, ditolak)
+3. Operator dapat export laporan ke PDF
+4. PDF berisi grafik dan tabel lengkap
+
+**Hasil:** Laporan statistik tersimpan dan dapat dibagikan
+
+---
+
+#### **8. UC-008: Login Operator**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator masuk ke sistem dengan kredensial.
+
+**Alur Normal:**
+
+1. Operator membuka halaman login
+2. Mengisi email dan password
+3. Sistem validasi kredensial
+4. Jika valid → redirect ke dashboard operator
+5. Jika invalid → tampilkan error
+
+**Hasil:** Operator login dan dapat mengakses fitur operator
+
+---
+
+#### **9. UC-009: Restore Permintaan Terhapus**
+
+**Actor:** Operator
+
+**Deskripsi:** Operator dapat mengembalikan permintaan yang sudah dihapus (soft delete).
+
+**Alur Normal:**
+
+1. Operator membuka halaman "Trash Permintaan"
+2. Melihat daftar permintaan yang sudah dihapus
+3. Klik restore untuk mengembalikan
+4. Permintaan kembali ke status sebelumnya
+5. Sistem membuat record restore
+
+**Hasil:** Permintaan berhasil di-restore dari trash
+
+---
+
+#### **10. UC-010: Tanda Tangan Digital**
+
+**Actor:** Karyawan
+
+**Deskripsi:** Karyawan menandatangani permintaan secara digital.
+
+**Alur Normal:**
+
+1. Karyawan membuka halaman permintaan
+2. Di bagian "Tanda Tangan Peminta", ada canvas untuk menandatangan
+3. Karyawan menandatangan menggunakan mouse/touchpad
+4. Dapat klik "Hapus" untuk menghapus dan ulang
+5. Saat submit, tanda tangan di-encode menjadi image dan disimpan
+
+**Hasil:** Tanda tangan tersimpan sebagai bukti otentikasi permintaan
+
+---
+
+### 📊 Use Case Matrix
+
+| Use Case | Karyawan | Operator | Database         | Description          |
+| -------- | -------- | -------- | ---------------- | -------------------- |
+| UC-001   | ✓        | -        | PERMINTAANS      | Ajukan Permintaan    |
+| UC-002   | ✓        | ✓        | BARANGS          | Lihat Stok Barang    |
+| UC-003   | -        | ✓        | BARANGS          | CRUD Barang          |
+| UC-004   | -        | ✓        | PERMINTAANS      | Proses Permintaan    |
+| UC-005   | -        | ✓        | BARANG_KELUARS   | Catat Barang Keluar  |
+| UC-006   | -        | ✓        | BARANG_HISTORIES | Lihat History        |
+| UC-007   | -        | ✓        | PERMINTAANS      | Generate Laporan     |
+| UC-008   | -        | ✓        | USERS            | Login Operator       |
+| UC-009   | -        | ✓        | PERMINTAANS      | Restore Permintaan   |
+| UC-010   | ✓        | -        | PERMINTAANS      | Tanda Tangan Digital |
 
 ---
 

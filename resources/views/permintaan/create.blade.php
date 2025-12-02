@@ -13,6 +13,13 @@
   <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>
 <body>
+  <!-- 🚀 Scroll to Top Button -->
+  <button id="scrollToTopBtn" class="scroll-to-top-btn">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="18 15 12 9 6 15"></polyline>
+    </svg>
+  </button>
+
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
@@ -499,6 +506,28 @@
 
       document.getElementById("multiForm").addEventListener("submit", function (e) {
         inputTandaTangan.value = signaturePad.isEmpty() ? "" : signaturePad.toDataURL("image/png");
+      });
+
+      // 🚀 Scroll to Top Button
+      const scrollToTopBtn = document.getElementById("scrollToTopBtn");
+      
+      window.addEventListener("scroll", function() {
+        if (window.pageYOffset > 300) {
+          scrollToTopBtn.style.display = "block";
+          scrollToTopBtn.style.opacity = "1";
+        } else {
+          scrollToTopBtn.style.opacity = "0";
+          setTimeout(() => {
+            scrollToTopBtn.style.display = "none";
+          }, 300);
+        }
+      });
+
+      scrollToTopBtn.addEventListener("click", function() {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
       });
     });
   </script>

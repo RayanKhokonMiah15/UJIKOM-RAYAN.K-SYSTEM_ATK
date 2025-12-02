@@ -863,7 +863,7 @@ Karyawan          Aplikasi       Database      Operator
 ### 🔐 Akun Default
 
 -   **Email:** admin@example.com
--   **Password:** password
+-   **Password:** password123
 -   **Role:** Admin/Operator
 
 ### 👨‍💼 Alur Karyawan

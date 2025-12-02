@@ -12,10 +12,10 @@ class UserSeeder extends Seeder
     {
         // Operator saja (karyawan tidak perlu akun login)
         User::updateOrCreate(
-            ['email' => 'operator@example.com'], //email bisa di ubah
+            ['email' => 'operator@example.com'], 
             [
                 'name' => 'Operator Gudang',
-                'password' => Hash::make('password123'), // password bisa di ubah
+                'password' => Hash::make('password123'), 
                 'role' => 'operator'
             ]
         );

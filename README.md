@@ -76,35 +76,11 @@ Aplikasi ini dikembangkan sebagai bagian dari **Uji Kompetensi** dengan fokus pa
 
 ![Use Case Diagram - Sistem Manajemen Barang](./docs/UseCaseDiagram.png)
 
-*Gambar di atas menunjukkan interaksi antara aktor (Karyawan, Operator) dengan sistem manajemen barang, termasuk semua fungsi dan proses utama.*
+_Gambar di atas menunjukkan interaksi antara aktor (Karyawan, Operator) dengan sistem manajemen barang, termasuk semua fungsi dan proses utama._
 
 ---
 
 #### ASCII Diagram (Alternatif):
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Sistem Manajemen Barang                  │
-└─────────────────────────────────────────────────────────────┘
-              ▲                                    ▲
-              │                                    │
-       ┌──────┴──────┐                    ┌────────┴────────┐
-       │              │                    │                 │
-    KARYAWAN      OPERATOR              DATABASE         SYSTEM
-       │              │                    │                 │
-       │              ├─── Lihat Barang ───┤                 │
-       │              │                    │                 │
-       ├─ Ajukan ────►├─── Proses Permintaan                 │
-       │  Permintaan  │                    │                 │
-       │              ├─── Kelola Stok ────┤                 │
-       │              │                    │                 │
-       │              ├─── Export Laporan ─┤                 │
-       │              │                    │                 │
-       │◄─ Notifikasi─┤                    ├─ Audit Trail ──┤
-       │              │                    │                 │
-       │◄─ Status ────┤                    │                 │
-       │              │                    │                 │
-```
 
 ### 📋 Detail Use Case
 
